@@ -2,8 +2,8 @@
 #include <string.h> 
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdbool.h>
 #include <stdlib.h>
+#include <errno.h>
 
 int lineNum(char *dictionaryName, char *word, int dictWidth) {
 	int rofst, offst, fd, top;
@@ -61,9 +61,9 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 	}
 
 	if(offst <= top && offst >= bot)  {
-		return(offst);
+		return(offst/dictWidth+1);
 	} else {
-		return(-offst);
+		return(-(offst/dictWidth + 1));
 	}
 
 
