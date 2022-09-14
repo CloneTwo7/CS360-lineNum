@@ -34,6 +34,7 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 		wordBuff[i] = '\0';
 	}
 
+	//Opens files and uses lseek to prepare binary search
 	fd = open(dictionaryName, O_RDONLY);
 	if(fd < 0) { //checks errors
 		fprintf(stderr, "Can't open %s for reading -- %s\n", dictionaryName, strerror(errno));
@@ -41,15 +42,17 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 	}
 
 	top = lseek(fd, offst, SEEK_END);
-	if(top < 0) {
+	if(top < 0) { //checks errors
 		fprintf(stderr, "lseek() failed to navigate -- %s\n", strerror(errno));
 		exit(errno);
 	}
-	
+	//initializes variables for bs	
 	top = top - dictWidth;
 	int numElem = top/dictWidth;
 	offst = numElem/2 * dictWidth;
 
+	//the following loop incremenets through the file utilizing binary search to determine wheather the words are 
+	//earlier or later in the alphabet
 	char *readBuff = calloc(1, sizeof(char) * dictWidth);
 	while(offst <= top && offst >= bot) {
 
@@ -78,16 +81,16 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 			top = offst; 
 			offst = bot;
 			if(top - dictWidth == bot || top == bot) { 
-				free(readBuff);
+				free(readBuff); //returns the last line searched
 				close(fd);
 				return (- (offst / dictWidth + 1));
 			}
-		} else if (result < 0) {
-			numElem = numElem/2;
+		} else if (result < 0) { //word not found
+			numElem = numElem/2; //adjust the top/bot
 			if(numElem < 2) numElem = 2;
 			bot = offst;
 			offst = offst + numElem/2 * dictWidth;
-			if(top <= bot) {
+			if(top <= bot) { //at a certain point, return the last line searched
 				free(readBuff);
 				close(fd);
 				return (- (offst / dictWidth ));
