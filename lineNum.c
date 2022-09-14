@@ -59,8 +59,6 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 			exit(errno);
 		}
 
-		printf("top: %d bot: %d\n", top, bot);
-		printf("%s\tto\t%s", readBuff, wordBuff);
 		int result = strcmp(readBuff, wordBuff);
 		if(result == 0) { //Word found, free buffers and return line
 			free(readBuff);
