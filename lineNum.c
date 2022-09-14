@@ -40,7 +40,6 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 		lseek(fd, offst, SEEK_SET);
 		read(fd, readBuff, dictWidth);
 
-		printf("offset: %d top: %d bot: %d\n", offst, top, bot);
 		int result = strcmp(readBuff, wordBuff);
 		if(result == 0) {
 			free(readBuff);
@@ -48,7 +47,6 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 			return (offst / dictWidth +1);
 		}
 		else if (result > 0) {
-			printf("searching up\n");
 			numElem = numElem/2;
 			if(numElem < 2) numElem = 2;
 			top = offst; 
@@ -59,7 +57,6 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 				return (- (offst / dictWidth + 1));
 			}
 		} else if (result < 0) {
-			printf("searching down\n");
 			numElem = numElem/2;
 			if(numElem < 2) numElem = 2;
 			bot = offst;
