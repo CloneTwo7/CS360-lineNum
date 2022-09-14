@@ -6,7 +6,9 @@
 #include <errno.h>
 
 int lineNum(char *dictionaryName, char *word, int dictWidth) {
-	int rofst, offst, fd, top;
+	int offst = 0;
+	int fd = 0;
+	int top = 0;
 	int bot = 0;
 	char wordBuff[dictWidth];
 
@@ -45,6 +47,7 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 
 	char *readBuff = calloc(1, sizeof(char) * dictWidth);
 	while(offst <= top && offst >= bot) {
+		
 		int erCheck = lseek(fd, offst, SEEK_SET);
 		if(erCheck < 0) {
 			fprintf(stderr, "lseek() failed to navigate -- %s\n", strerror(errno));
@@ -56,18 +59,23 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 			exit(errno);
 		}
 
+		printf("top: %d bot: %d\n", top, bot);
+		printf("%s\tto\t%s", readBuff, wordBuff);
 		int result = strcmp(readBuff, wordBuff);
 		if(result == 0) { //Word found, free buffers and return line
 			free(readBuff);
+			close(fd);
 			return (offst / dictWidth +1);
 		}
 		else if (result > 0) { //word not found
+
 			numElem = numElem/2; //adjust the top/bot
 			if(numElem < 2) numElem = 2;
 			top = offst; 
 			offst = bot;
 			if(top - dictWidth == bot || top == bot) { 
 				free(readBuff);
+				close(fd);
 				return (- (offst / dictWidth + 1));
 			}
 		} else if (result < 0) {
@@ -75,8 +83,9 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 			if(numElem < 2) numElem = 2;
 			bot = offst;
 			offst = offst + numElem/2 * dictWidth;
-			if(top - dictWidth == bot) {
+			if(top - dictWidth == bot || top == bot) {
 				free(readBuff);
+				close(fd);
 				return (- (offst / dictWidth + 1));
 			}
 		}
