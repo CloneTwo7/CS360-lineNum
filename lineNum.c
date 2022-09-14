@@ -23,17 +23,21 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 		}
 		i++;
 	}
-	wordBuff[dictWidth] = '\0';
+	if(i == dictWidth) {
+		wordBuff[i-1] = '\n';
+		wordBuff[i] = '\0';
+	}
 
 	fd = open(dictionaryName, O_RDONLY);
 	if(fd < 0) { //checks errors
-		//handle error
-		return(0);
+		fprintf(stderr, "Can't open %s for reading -- %s\n", dictionaryName, strerror(errno));
+		exit(errno);
 	}
 
 	top = lseek(fd, offst, SEEK_END);
 	if(top < 0) {
-		//handle error
+		fprintf(stderr, "lseek() failed to navigate -- %s\n", strerror(errno));
+		exit(errno);
 	}
 	
 	int numElem = top/dictWidth;
@@ -41,8 +45,16 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 
 	char *readBuff = calloc(1, sizeof(char) * dictWidth);
 	while(offst <= top && offst >= bot) {
-		lseek(fd, offst, SEEK_SET);
-		read(fd, readBuff, dictWidth);
+		int erCheck = lseek(fd, offst, SEEK_SET);
+		if(erCheck < 0) {
+			fprintf(stderr, "lseek() failed to navigate -- %s\n", strerror(errno));
+			exit(errno);
+		}
+		erCheck = read(fd, readBuff, dictWidth);
+		if(erCheck == -1) {
+			fprintf(stderr, "failed to read file %s Following error occured: %s\n", dictionaryName, strerror(errno));
+			exit(errno);
+		}
 
 		int result = strcmp(readBuff, wordBuff);
 		if(result == 0) { //Word found, free buffers and return line
