@@ -15,8 +15,12 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 	
 	//The following loop builds our compare buffer
 	int i = 0;
+	int readNull = 0;
 	while(i < dictWidth) {
-		if(word[i] != '\0') {
+		if(word[i] == '\0') {
+			readNull = 1;
+		}
+		if(word[i] != '\0'&&readNull==0) {
 			wordBuff[i] = word[i];
 		} else if(i < dictWidth -1) { 
 			wordBuff[i] =  ' ';
@@ -60,6 +64,7 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 			exit(errno);
 		}
 
+		readBuff[dictWidth] = '\0';
 		int result = strcmp(readBuff, wordBuff);
 		if(result == 0) { //Word found, free buffers and return line
 			free(readBuff);
