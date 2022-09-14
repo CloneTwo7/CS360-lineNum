@@ -24,7 +24,6 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 		i++;
 	}
 	wordBuff[dictWidth] = '\0';
-	printf("%s\n", wordBuff);
 
 	fd = open(dictionaryName, O_RDONLY);
 	if(fd < 0) { //checks errors

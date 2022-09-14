@@ -4,8 +4,8 @@ int lineNum(char*, char*, int);
 
 int main(int argc, char** argv) {
 
-	char word[9] = "fi sh";
-	printf("%s is found on line %d\n", word, lineNum("tiny_9", word, 9));
+	char word[16] = "abc";
+	printf("%s is found on line %d\n", word, lineNum("webster_16", word, 16));
 
 	return(0);
 }
