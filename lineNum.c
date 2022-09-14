@@ -66,7 +66,7 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 			if(numElem < 2) numElem = 2;
 			top = offst; 
 			offst = bot;
-			if(top - dictWidth == bot) { 
+			if(top - dictWidth == bot || top == bot) { 
 				free(readBuff);
 				return (- (offst / dictWidth + 1));
 			}
