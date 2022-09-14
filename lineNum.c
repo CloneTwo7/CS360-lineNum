@@ -35,38 +35,41 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 	int numElem = top/dictWidth;
 	offst = numElem/2 * dictWidth;
 
-	while(offst <= top && offst >= bot && top > bot) {
+	while(offst <= top && offst >= bot) {
 		char *readBuff = calloc(1, sizeof(char) * dictWidth);
 		lseek(fd, offst, SEEK_SET);
 		read(fd, readBuff, dictWidth);
 
+		printf("offset: %d top: %d bot: %d\n", offst, top, bot);
 		int result = strcmp(readBuff, wordBuff);
 		if(result == 0) {
 			free(readBuff);
-			break;
+			free(wordBuff);
+			return (offst / dictWidth +1);
 		}
 		else if (result > 0) {
+			printf("searching up\n");
 			numElem = numElem/2;
 			if(numElem < 2) numElem = 2;
 			top = offst; 
 			offst = bot;
 			free(readBuff);
+			if(top - dictWidth == bot) { 
+				free(wordBuff);
+				return (- (offst / dictWidth + 1));
+			}
 		} else if (result < 0) {
+			printf("searching down\n");
 			numElem = numElem/2;
 			if(numElem < 2) numElem = 2;
 			bot = offst;
 			offst = offst + numElem/2 * dictWidth;
 			free(readBuff);
+			if(top - dictWidth == bot) {
+				free(wordBuff);
+				return (- (offst / dictWidth + 1));
+			}
 		}
 	}
-
-	if(offst <= top && offst >= bot)  {
-		return(offst/dictWidth+1);
-	} else {
-		return(-(offst/dictWidth + 1));
-	}
-
-
-	free(wordBuff);
 
 }
