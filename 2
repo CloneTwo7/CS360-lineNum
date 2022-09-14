@@ -8,23 +8,19 @@
 int lineNum(char *dictionaryName, char *word, int dictWidth) {
 	int rofst, offst, fd, top;
 	int bot = 0;
-	char wordBuff[dictWidth];
+	char *wordBuff = calloc(1, sizeof(char) * dictWidth);
 
 	
 	//The following loop builds our compare buffer
-	int i = 0;
-	while(i < dictWidth) {
-		if(word[i] != '\0') {
+	for(int i = 0; i < dictWidth; i++) {
+		if(i < strlen(word)) {
 			wordBuff[i] = word[i];
 		} else if(i < dictWidth -1) { 
 			wordBuff[i] =  ' ';
 		} else {
-			wordBuff[i] = '\n';
+			wordBuff[i] = '\0';
 		}
-		i++;
 	}
-	wordBuff[dictWidth] = '\0';
-	printf("%s\n", wordBuff);
 
 	fd = open(dictionaryName, O_RDONLY);
 	if(fd < 0) { //checks errors
@@ -46,17 +42,20 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 		read(fd, readBuff, dictWidth);
 
 		int result = strcmp(readBuff, wordBuff);
-		if(result == 0) { //Word found, free buffers and return line
+		if(result == 0) {
 			free(readBuff);
+			free(wordBuff);
 			return (offst / dictWidth +1);
 		}
-		else if (result > 0) { //word not found
-			numElem = numElem/2; //adjust the top/bot
+		else if (result > 0) {
+			numElem = numElem/2;
 			if(numElem < 2) numElem = 2;
 			top = offst; 
 			offst = bot;
 			if(top - dictWidth == bot) { 
+				printf("%d %d %d\n", offst, top, bot);
 				free(readBuff);
+				free(wordBuff);
 				return (- (offst / dictWidth + 1));
 			}
 		} else if (result < 0) {
@@ -65,7 +64,9 @@ int lineNum(char *dictionaryName, char *word, int dictWidth) {
 			bot = offst;
 			offst = offst + numElem/2 * dictWidth;
 			if(top - dictWidth == bot) {
+				printf("%d %d %d\n", offst, top, bot);
 				free(readBuff);
+				free(wordBuff);
 				return (- (offst / dictWidth + 1));
 			}
 		}
